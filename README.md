@@ -1,5 +1,5 @@
-# logistic-RL
-# Reinforcement Learning for Heat-treatment
+# Logistic-RL
+
 ## 0 -- Installation
 
 ### 0.1 -- Creating the conda env
