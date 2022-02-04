@@ -1,0 +1,11 @@
+numpy==1.19.5
+msgpack==1.0.2
+packaging==21.0
+pandas==1.3.1
+tensorboard==2.6.0
+tensorflow==2.6.0
+tqdm
+-e git+https://github.com/openai/gym@4ede9280f9c477f1ca09929d10cdc1e1ba1129f1#egg=gym
+ray @ https://s3-us-west-2.amazonaws.com/ray-wheels/latest/ray-2.0.0.dev0-cp38-cp38-manylinux2014_x86_64.whl
+ray[rllib]
+pyhocon
