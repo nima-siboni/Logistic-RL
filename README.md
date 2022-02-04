@@ -18,8 +18,8 @@ pip install --upgrade pip
 ```
 ### 0.4 -- Clone the project
 ```buildoutcfg
-git clone git@github.com:nima-siboni/RL-Heat-Treatment.git
-cd RL-Heat-Treatment
+git clone git@github.com:nima-siboni/Logistic-RL.git
+cd Logistic-RL
 ```
 
 ### 0.4 -- Install the requirements
