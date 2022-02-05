@@ -156,6 +156,7 @@ class Knapsack(gym.Env):
 
     def close(self):
         raise NotImplementedError
+
     @property
     def nr_categories(self):
         """

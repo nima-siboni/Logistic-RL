@@ -28,11 +28,17 @@ Install the requirements in the env
 pip install -r requirements.txt
 ```
 
+### 0.5 -- Install the package locally
+Install the Logistic-RL package  in the current environment
+```buildoutcfg
+pip install -e .
+```
+
 Have fun!
 
 ## 1 -- The environment
-TODO
+TBD
 ## 1.1 -- Environment configs
-TODO
+TBD
 ## 1.2 -- State, action, reward, termination
-TODO
+TBD
