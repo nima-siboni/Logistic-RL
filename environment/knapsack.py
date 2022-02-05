@@ -1,5 +1,10 @@
+import copy
+
 import numpy as np
 import gym
+
+from src.gym.gym.utils import seeding
+from src.gym.gym.vector.utils import spaces
 
 
 class Knapsack(gym.Env):
@@ -50,6 +55,8 @@ class Knapsack(gym.Env):
     - the state is not affected with this last action,
     - the episode is ended,
     - reward zero is returned
+    Or
+    When all the available items are gone (there is nothing left to pick up).
     """
 
     def __init__(self, env_config):
@@ -64,10 +71,122 @@ class Knapsack(gym.Env):
         - seed: the random seed; either an integer or None. In case None is given, the seed is not fixed.
         """
         super(Knapsack, self).__init__()
-        conf = env_config['conf']
+        # 0 - offloading the configs
+        self.conf = env_config['conf']
         # the total capacity
-        capacity = conf.capacity
+        capacity = self.conf.capacity
+
         # typical max and min number of available items for each category
-        min_availability = np.array(conf.min_availability)
-        max_availability = np.array(conf.max_availability)
-        # TODO: Offload the configs and implement the necessary functions.
+        self.min_availability = np.array(self.conf.min_availability, dtype=np.float32)
+        self.max_availability = np.array(self.conf.max_availability, dtype=np.float32)
+        self.seed_value = None if self.conf.seed_value == 'None' else self.conf.seed_value
+        # 1 - Observation space
+        self.observation_space = spaces.Dict(
+            {'availability': spaces.Box(low=self.min_availability, high=self.max_availability, dtype=np.float32),
+             'used capacity': spaces.Box(low=np.array([0]), high=np.array([capacity]), shape=(1,), dtype=np.float32)
+             })
+
+        # 2 - Action space
+        self.action_space = spaces.Discrete(self.conf.nr_categories)
+
+        # 3 - Seeding
+        self.state = None
+        self.done = None
+        self.np_random = None
+        self.seed(self.seed_value)
+        self.reset()
+
+    def seed(self, seed_value=None):
+        """
+        Sets the seed of the random generator
+        :param seed_value: the value for the seed, if None is given the
+        :return:
+        """
+        if seed_value is not None:
+            self.np_random, seed = seeding.np_random(seed_value)
+        else:
+            self.np_random, seed = seeding.np_random()
+
+        return [seed]
+
+    def reset(self):
+        """
+        Resets the state to a random state and the variable done to False.
+        :return: the state
+        """
+        availability = [self.np_random.randint(low=self.min_availability[i],
+                                               high=self.max_availability[i] + 1) for i in range(self.nr_categories)]
+        self.state = {'availability': np.array(availability, dtype=np.float32),
+                      'used capacity': np.array([0], dtype=np.float32)}
+        self.done = False
+        return self.state
+
+    def step(self, action):
+        """
+        Takes one step of packing with the given action. Here the action points to which category to pack from next.
+        In case the action is not admissible (there are zero items in the chosen category available), nothing happens.
+        In case we pack beyond the capacity or there is nothing left to pack, the process is terminated.
+        :param action: the taken action; an integer indicating from which category agent picks an item.
+        :return: state, reward, done, info
+        """
+        done = False
+        backup = copy.deepcopy(self.state)
+        # Apply the action
+        self.state['availability'][action] -= 1.0
+        self.state['used capacity'][0] += self.masses[action]
+        reward = self.values[action]
+        # if the action was not possible
+        if self.state['availability'][action] < 0.:
+            self.state = backup
+            reward = 0
+        # Terminate if:
+        # - all the available items are gone (in this case take the reward calculated before).
+        # - we went beyond the capacity. in this case revert the action and reward zero.
+        if all(self.state['availability'] == 0):
+            done = True
+        if self.state['used capacity'][0] > self.capacity:
+            self.state = backup
+            done = True
+            reward = 0
+
+        return self.state, reward, done, {}
+
+    def render(self, mode):
+        raise NotImplementedError
+
+    def close(self):
+        raise NotImplementedError
+    @property
+    def nr_categories(self):
+        """
+        :return: the number of categories.
+        """
+        return self.conf.nr_categories
+
+    @property
+    def capacity(self):
+        """
+        :return: the mass capacity of the knapsack.
+        """
+        return self.conf.capacity
+
+    @property
+    def masses(self):
+        """
+        :return: the masses of the categories
+        """
+        return self.conf.specific_masses
+
+    @property
+    def values(self):
+        """
+        :return: the monetary values of the categories
+        """
+        return self.conf.specific_values
+
+    @property
+    def available_capacity(self):
+        """
+        :return: the empty space.
+        """
+        return self.capacity - self.state['used capacity'][0]
