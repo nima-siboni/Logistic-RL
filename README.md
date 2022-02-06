@@ -113,7 +113,7 @@ of available items for each category is an integer between the min and max avail
 config, the initial number of items available in the first four categories are in range [10, 100).
 
 Note: The above values for mass and prices are based on
-(DHL Leistungen und Preise)[https://www.deutschepost.de/content/dam/dpag/images/G_g/Gesamtpreisliste/dp-leistungen-und-preise-01-2022.pdf]
+[DHL Leistungen und Preise (2022)](https://www.deutschepost.de/content/dam/dpag/images/G_g/Gesamtpreisliste/dp-leistungen-und-preise-01-2022.pdf).
 ### 3.2 -- Instantiating the Environment
 After creating the config file, one can instantiate an instance of the environment simply by:
 ```python
