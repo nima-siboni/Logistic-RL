@@ -82,7 +82,8 @@ class Knapsack(gym.Env):
         self.seed_value = None if self.conf.seed_value == 'None' else self.conf.seed_value
         # 1 - Observation space
         self.observation_space = spaces.Dict(
-            {'availability': spaces.Box(low=self.min_availability, high=self.max_availability, dtype=np.float32),
+            {'availability': spaces.Box(low=np.zeros_like(self.min_availability, dtype=np.float32),
+                                        high=self.max_availability, dtype=np.float32),
              'used capacity': spaces.Box(low=np.array([0]), high=np.array([capacity]), shape=(1,), dtype=np.float32)
              })
 
