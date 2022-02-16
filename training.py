@@ -1,8 +1,11 @@
 import ray
 from pyhocon import ConfigFactory
 import ray.rllib.agents.dqn as dqn
+from ray.tune.registry import register_env
+
 from environment.knapsack import Knapsack
 from utils.utils import conf_value_checking
+from utils.wrapper import DictWrapper
 
 # 0 - Reading and sanity check of the configs
 conf = ConfigFactory.parse_file('meta_conf.conf')
@@ -11,10 +14,17 @@ conf_value_checking(conf)
 
 # 2 - Creating the agent
 ray.init(ignore_reinit_error=True)
+# register the environment
+if conf.Env.state_wrapper:
+    register_env("Knapsack", lambda cnfg: DictWrapper(Knapsack(env_config=cnfg)))
+else:
+    register_env("Knapsack", lambda cnfg: Knapsack(env_config=cnfg))
+
+# agent's config
 config = dqn.DEFAULT_CONFIG.copy()
 config['num_workers'] = conf.training.num_workers
 config['env_config'] = {'conf': conf.Env}
-agents = dqn.DQNTrainer(config=config, env=Knapsack)
+agents = dqn.DQNTrainer(config=config, env="Knapsack")
 # 3. Training
 for i in range(conf.training.nr_episodes):
     training_res = agents.train()

@@ -96,6 +96,7 @@ In order to create an environment, one needs a config file, e.g. [meta_conf.conf
         seed_value = None  # if None is given it randomly chooses a seed.
         min_availability = [10,   10,  10,  10, 5,  2,  2,  2, 1, 1] # min number of possible items for each category
         max_availability = [100, 100, 100, 100, 50, 25, 20, 5, 3, 2] # max number of possible items for each category
+        state_wrapper = True # if True, the state of the env is wrapped.
     }
 }
 ```
@@ -111,6 +112,7 @@ item from the first category, the agent earn 45 cents.
 * ```min_ and max_availability```: when initializing the environment, a random list of available items is created, where the number
 of available items for each category is an integer between the min and max availability. For example for the above 
 config, the initial number of items available in the first four categories are in range [10, 100).
+* ```state_wrapper```: if True, the state of the env is wrapped and the state is scaled to be between 0 and 1.
 
 Note: The above values for mass and prices are based on
 [DHL Leistungen und Preise (2022)](https://www.deutschepost.de/content/dam/dpag/images/G_g/Gesamtpreisliste/dp-leistungen-und-preise-01-2022.pdf).
