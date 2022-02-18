@@ -130,7 +130,7 @@ class Knapsack(gym.Env):
         :param action: the taken action; an integer indicating from which category agent picks an item.
         :return: state, reward, done, info
         """
-        done = False
+        self.done = False
         backup = copy.deepcopy(self.state)
         # Apply the action
         self.state['availability'][action] -= 1.0
@@ -144,13 +144,13 @@ class Knapsack(gym.Env):
         # - all the available items are gone (in this case take the reward calculated before).
         # - we went beyond the capacity. in this case revert the action and reward zero.
         if all(self.state['availability'] == 0):
-            done = True
+            self.done = True
         if self.state['used capacity'][0] > self.capacity:
             self.state = backup
-            done = True
+            self.done = True
             reward = 0
 
-        return self.state, reward, done, {}
+        return self.state, reward, self.done, {}
 
     def render(self, mode):
         raise NotImplementedError
